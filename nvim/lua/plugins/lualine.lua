@@ -12,7 +12,7 @@ local colors = {
   cream = "#dfcfa6",
   orange = "fab387",
 }
-local hoonyboom = {
+local hyezoprk = {
   normal = {
     a = { fg = colors.black, bg = colors.skyblue, gui = "bold" },
     b = { fg = colors.black, bg = colors.cream },
@@ -58,7 +58,7 @@ return {
   config = function()
     require("lualine").setup({
       options = {
-        theme = hoonyboom,
+        theme = hyezoprk,
         component_separators = "",
         section_separators = { left = " ", right = " " },
       },

@@ -3,3 +3,7 @@ fontforge
 istherenet
 펌웨어
 **/.DS_Store
+gh/hosts.yml
+github-copilot/apps.json
+nvim/lua/user/codelldb-darwin-arm64/
+swiftpm/

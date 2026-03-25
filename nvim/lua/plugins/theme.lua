@@ -34,6 +34,9 @@ return {
       vim.cmd('highlight @lsp.typemod.variable.declaration.typescript guifg=#BB97EE')
       -- 회색
       vim.cmd('highlight typescriptDecorator guifg=#7E8294')
+
+      -- 셀렉션
+      vim.cmd('highlight Visual guibg=#534C44 guifg=NONE')
     end
   },
 

@@ -13,13 +13,23 @@ return {
       },
       preview = {
         enable = true,
-        modes = { "n", "i", "c" },
-        hybrid_modes = { "n", "i", "c" },
         render_distance = { 200, 200 },
+        filetypes = { "markdown", "mdx" },
       },
       markdown = {
         headings = presets_headings.glow, --other cool opts are  or presets.glow_center
         horizontal_rules = presets_horizontal.thick,
+        list_items = {
+          indent_size = 1,
+          shift_width = 1,
+        },
+        -- 수영 admonition 자동완성 등록 (blink-markview가 이 목록을 읽음)
+        block_quotes = {
+          WARM  = { preview = "Warm-up",   border = "│" },
+          MAIN  = { preview = "Main set",  border = "│" },
+          DRILL = { preview = "Drill",     border = "│" },
+          COOL  = { preview = "Cool-down", border = "│" },
+        },
       },
       markdown_inline = {
         checkboxes = presets_checkboxes.nerd,

@@ -18,7 +18,6 @@ vim.opt.guicursor = {
   "o:hor50",
 }
 
-vim.g.mapleader = " "
 -- vim.keymap.set({ "n", "v", "o" }, "s", "<nop>", { noremap = true, silent = true, desc = "기본 s 효력 중지" })
 vim.keymap.set({ "n", "v", "o" }, "f", "<nop>", { noremap = true, silent = true, desc = "기본 f 효력 중지" })
 vim.keymap.set("n", "j", "gj", { noremap = true, silent = true })

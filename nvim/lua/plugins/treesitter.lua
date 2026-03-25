@@ -6,8 +6,9 @@ return {
     ensure_installed = {
       "lua",
       "tsx",
-      "typescirpt",
+      "typescript",
       "javascript",
+      "swift",
       "css",
       "scss",
       "html",

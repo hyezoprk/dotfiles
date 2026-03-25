@@ -31,13 +31,14 @@ yabai -m config external_bar               all:0:0     \
                 right_padding              2            \
                 window_gap                 5
 # Exclude problematic apps from being managed:
-yabai -m rule --add app="^(Linear|Beekeeper Studio|Bruno|LuLu|미리보기|iPhone 미러링|Calculator|Software Update|Dictionary|System Preferences|Archive Utility|App Store|Postman|Slack|Activity Monitor|Sip|CleanShot X|시스템 설정|FaceTime|메모|활성 상태 보기|사진|Raycast|Finder|서체 관리자|Sleeve|음악|IINA|Transmission|음성 메모|카카오톡|메시지)$" manage=off
+yabai -m rule --add app="^(Microsoft Excel|카카오톡|Linear|Reeder|Beekeeper Studio|LuLu|미리보기|iPhone 미러링|Calculator|Software Update|Dictionary|System Preferences|Archive Utility|App Store|Postman|Slack|Activity Monitor|Sip|CleanShot X|시스템 설정|FaceTime|메모|활성 상태 보기|사진|Raycast|Finder|서체 관리자|음악|IINA|Transmission|음성 메모|카카오톡|메시지|텍스트 편집기)$" manage=off
 yabai -m rule --add label="Finder" app="^Finder$" title="(Co(py|nnect)|Move|Info|Pref)" manage=off
 yabai -m rule --add label="Safari" app="^Safari$" title="^(General|(Tab|Password|Website|Extension)s|AutoFill|Se(arch|curity)|Privacy|Advance)$" manage=off
 yabai -m rule --add label="Arc" app="^Arc$" title="^(hyezo|General|Max|Shortcuts|Links|Advanced)$" manage=off
 yabai -m rule --add label="Raycast" app="^Raycast$" title="^(General)$" manage=off
 yabai -m rule --add label="About This Mac" app="System Information" title="About This Mac" manage=off
 yabai -m rule --add label="Select file to save to" app="^Inkscape$" title="Select file to save to" manage=off
+yabai -m rule --add app="Zen" title="화면 속 화면" manage=off
 
 yabai -m config layout bsp
 

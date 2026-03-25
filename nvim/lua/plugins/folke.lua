@@ -8,6 +8,7 @@ return {
     end,
     config = function()
       local wk = require("which-key")
+      local xcodebuild = require("xcodebuild.integrations.dap")
 
       wk.setup()
       wk.add({
@@ -16,9 +17,11 @@ return {
         { "<leader>g", group = "Git" },
         { "<leader>s", group = "Search" },
         { "<leader>t", group = "Todo" },
+        { "<leader>x", group = "Xcode" },
+        { "<leader>d", group = "Debug" },
 
-        { "<leader>d", "<CMD>Alpha<CR>",                desc = "Dashboard" },
-        { "<leader>l", "<CMD>Lazy<CR>",                 desc = "LazyVim" },
+        { "<leader>D", "<CMD>Alpha<CR>",                desc = "Dashboard" },
+        { "<leader>L", "<CMD>Lazy<CR>",                 desc = "LazyVim" },
         { "<leader>c", "<CMD>e ~/.config/nvim/lua<CR>", desc = "Config" },
         { "<leader>q", "<CMD>wqa!<CR>",                 desc = "Save & Quit" },
         {
@@ -56,7 +59,7 @@ return {
           end,
           desc = "Scratch anything",
         },
-        { "<leader>sf", "<CMD>BufferLineSortByDirectory<CR>", desc = "Sorting buffers by directory" },
+        { "<leader>sf", "<CMD>BufferLineSortByDirectory<CR>",                  desc = "Sorting buffers by directory" },
 
         -- Snacks
         -- Top Pickers & Explorer
@@ -411,6 +414,28 @@ return {
           end,
           desc = "Goto Type Definition",
         },
+
+        -- Xcode
+        { "<leader>xs", "<cmd>XcodebuildSetup<cr>",                            desc = "Build Setup" },
+        { "<leader>xp", "<cmd>XcodebuildPicker<cr>",                           desc = "Build Picker" },
+        { "<leader>xl", "<cmd>XcodebuildToggleLogs<cr>",                       desc = "Toggle Xcodebuild Logs" },
+        { "<leader>xb", "<cmd>XcodebuildBuild<cr>",                            desc = "Build Project" },
+        { "<leader>xr", "<cmd>XcodebuildBuildRun<cr>",                         desc = "Build & Run Project" },
+        { "<leader>xt", "<cmd>XcodebuildTest<cr>",                             desc = "Run Tests" },
+        { "<leader>xT", "<cmd>XcodebuildTestClass<cr>",                        desc = "Run This Test Class" },
+        { "<leader>xd", "<cmd>XcodebuildSelectDevice<cr>",                     desc = "Select Device" },
+        { "<leader>xP", "<cmd>XcodebuildSelectTestPlan<cr>",                   desc = "Select Test Plan" },
+        { "<leader>xc", "<cmd>XcodebuildToggleCodeCoverage<cr>",               desc = "Toggle Code Coverage" },
+        { "<leader>xC", "<cmd>XcodebuildShowCodeCoverageReport<cr>",           desc = "Show Code Coverage Report" },
+        { "<leader>xq", "<cmd>Telescope quickfix<cr>",                         desc = "Show QuickFix List" },
+
+        { "<leader>dd", function() xcodebuild.build_and_debug() end,           desc = "Build & Debug" },
+        { "<leader>dr", function() xcodebuild.debug_without_build() end,       desc = "Debug Without Building" },
+        { "<leader>dt", function() xcodebuild.debug_tests() end,               desc = "Debug Tests" },
+        { "<leader>dT", function() xcodebuild.debug_class_tests() end,         desc = "Debug Class Tests" },
+        { "<leader>b",  function() xcodebuild.toggle_breakpoint() end,         desc = "Toggle Breakpoint" },
+        { "<leader>B",  function() xcodebuild.toggle_message_breakpoint() end, desc = "Toggle Message Breakpoint" },
+        { "<leader>dx", function() xcodebuild.terminate_session() end,         desc = "Terminate Debugger" },
       })
     end,
   },
@@ -486,6 +511,10 @@ return {
     "folke/todo-comments.nvim",
     event = "BufRead",
     dependencies = "nvim-lua/plenary.nvim",
-    opts = {},
+    opts = {
+      highlight = {
+        comments_only = true, -- 주석 안에서만 매칭 (코드의 <Note> 등 오매칭 방지)
+      },
+    },
   },
 }

@@ -23,6 +23,7 @@ local hyezoprk = {
   insert = {
     a = { fg = colors.black, bg = colors.salary, gui = "bold" },
     b = { fg = colors.smokeWhite, bg = colors.neutral },
+    y = { fg = colors.smokeWhite, bg = colors.neutral },
   },
   visual = {
     a = { fg = colors.black, bg = colors.lavender, gui = "bold" },
@@ -108,10 +109,19 @@ return {
         },
         lualine_y = {
           {
+            function()
+              local m = vim.fn.mode()
+              if m == "i" or m == "v" or m == "V" or m == "" then return "" end
+              return ""
+            end,
+            color = { fg = colors.coral, bg = colors.neutral },
+            padding = 0,
+            separator = "",
+          },
+          {
             "filetype",
             icon_only = true,
             padding = { left = 1, right = 0 },
-            separator = { left = "" },
           },
           "filename",
         },

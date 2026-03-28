@@ -8,7 +8,6 @@ return {
     end,
     config = function()
       local wk = require("which-key")
-      local xcodebuild = require("xcodebuild.integrations.dap")
 
       wk.setup()
       wk.add({
@@ -429,13 +428,13 @@ return {
         { "<leader>xC", "<cmd>XcodebuildShowCodeCoverageReport<cr>",           desc = "Show Code Coverage Report" },
         { "<leader>xq", "<cmd>Telescope quickfix<cr>",                         desc = "Show QuickFix List" },
 
-        { "<leader>dd", function() xcodebuild.build_and_debug() end,           desc = "Build & Debug" },
-        { "<leader>dr", function() xcodebuild.debug_without_build() end,       desc = "Debug Without Building" },
-        { "<leader>dt", function() xcodebuild.debug_tests() end,               desc = "Debug Tests" },
-        { "<leader>dT", function() xcodebuild.debug_class_tests() end,         desc = "Debug Class Tests" },
-        { "<leader>b",  function() xcodebuild.toggle_breakpoint() end,         desc = "Toggle Breakpoint" },
-        { "<leader>B",  function() xcodebuild.toggle_message_breakpoint() end, desc = "Toggle Message Breakpoint" },
-        { "<leader>dx", function() xcodebuild.terminate_session() end,         desc = "Terminate Debugger" },
+        { "<leader>dd", function() require("xcodebuild.integrations.dap").build_and_debug() end,           desc = "Build & Debug" },
+        { "<leader>dr", function() require("xcodebuild.integrations.dap").debug_without_build() end,       desc = "Debug Without Building" },
+        { "<leader>dt", function() require("xcodebuild.integrations.dap").debug_tests() end,               desc = "Debug Tests" },
+        { "<leader>dT", function() require("xcodebuild.integrations.dap").debug_class_tests() end,         desc = "Debug Class Tests" },
+        { "<leader>b",  function() require("xcodebuild.integrations.dap").toggle_breakpoint() end,         desc = "Toggle Breakpoint" },
+        { "<leader>B",  function() require("xcodebuild.integrations.dap").toggle_message_breakpoint() end, desc = "Toggle Message Breakpoint" },
+        { "<leader>dx", function() require("xcodebuild.integrations.dap").terminate_session() end,         desc = "Terminate Debugger" },
       })
     end,
   },

@@ -74,5 +74,28 @@ return paths as text
       end,
       desc = "Paste image(s) to MDX",
     },
+    {
+      "<leader>pd",
+      function()
+        local line = vim.fn.getline(".")
+        local img_path = line:match("!%[.-%]%((/assets/posts/[^)]+)%)")
+        if not img_path then
+          vim.notify("이미지 링크 없음", vim.log.levels.WARN)
+          return
+        end
+        local fs_path = vim.fn.getcwd() .. "/public" .. img_path
+        if vim.fn.filereadable(fs_path) == 0 then
+          vim.notify("파일 없음: " .. fs_path, vim.log.levels.WARN)
+          return
+        end
+        vim.ui.input({ prompt = "삭제? " .. img_path .. " [y/N] " }, function(input)
+          if input ~= "y" then return end
+          vim.fn.delete(fs_path)
+          vim.api.nvim_del_current_line()
+          vim.notify("삭제됨: " .. img_path)
+        end)
+      end,
+      desc = "Delete image file and line",
+    },
   },
 }

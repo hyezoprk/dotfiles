@@ -60,6 +60,18 @@ return {
         -- <YoutubePlaylist src="..." />
         s("ytpl", fmt('<YoutubePlaylist src="{}" />', { i(1) })),
 
+        -- <Music src="..." />
+        s("music", fmt('<Music src="{}" />', { i(1) })),
+
+        -- <SoundCloud src="..." />
+        s("sc", fmt('<SoundCloud src="{}" />', { i(1) })),
+
+        -- <Book bid="..." />
+        s("book", fmt('<Book bid="{}" />', { i(1) })),
+
+        -- <Movie mid="..." rating="..." />
+        s("movie", fmt('<Movie mid="{}" rating="{}" />', { i(1), i(2, "4") })),
+
         -- blockquote label (color badges)
         s("red",    { t({ "> [!red]",    "> " }), i(0) }),
         s("orange", { t({ "> [!orange]", "> " }), i(0) }),

@@ -1,0 +1,40 @@
+diff --git a/src/session.rs b/src/session.rs
+index f34699f..c1eedbc 100644
+--- a/src/session.rs
++++ b/src/session.rs
+@@ -1226,16 +1226,33 @@ fn discover_claude_tmux_panes() -> Vec<(i32, String, String, String)> {
+ 
+ /// Check if a shell process has a claude child by looking for a child PID
+ /// that has a corresponding ~/.claude/sessions/{PID}.json file.
++/// Recurses up to `depth` levels to handle shells like fish that spawn an
++/// intermediate child process before exec-ing claude.
+ fn find_claude_child_pid(parent_pid: i32) -> Option<i32> {
+     let sessions_dir = dirs::home_dir()?.join(".claude").join("sessions");
++    find_claude_child_pid_recursive(parent_pid, &sessions_dir, 3)
++}
++
++fn find_claude_child_pid_recursive(parent_pid: i32, sessions_dir: &std::path::Path, depth: u8) -> Option<i32> {
++    if depth == 0 {
++        return None;
++    }
+     let output = std::process::Command::new("pgrep")
+         .args(["-P", &parent_pid.to_string()])
+         .output()
+         .ok()?;
+-    String::from_utf8_lossy(&output.stdout)
++    let children: Vec<i32> = String::from_utf8_lossy(&output.stdout)
+         .lines()
+         .filter_map(|l| l.trim().parse::<i32>().ok())
+-        .find(|pid| sessions_dir.join(format!("{pid}.json")).exists())
++        .collect();
++
++    // Check direct children first
++    if let Some(&pid) = children.iter().find(|&&pid| sessions_dir.join(format!("{pid}.json")).exists()) {
++        return Some(pid);
++    }
++
++    // Recurse into children (handles fish's intermediate child process)
++    children.iter().find_map(|&pid| find_claude_child_pid_recursive(pid, sessions_dir, depth - 1))
+ }
+ 
+ #[cfg(test)]

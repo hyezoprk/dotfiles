@@ -91,28 +91,46 @@ def parse(raw):
 
     s_pct = w_pct = s_reset = w_reset = None
 
-    # 세션 % — "Curr(e|e)tsession" 이후 첫 번째 NN%
+    MONTHS = {'jan':1,'feb':2,'mar':3,'apr':4,'may':5,'jun':6,
+              'jul':7,'aug':8,'sep':9,'oct':10,'nov':11,'dec':12}
+
+    def to24h(t):
+        m = re.match(r'(\d{1,2})(?::(\d{2}))?([ap]m)', t, re.I)
+        if not m:
+            return t
+        h, mn, period = int(m.group(1)), int(m.group(2) or 0), m.group(3).lower()
+        if period == 'am':
+            h = 0 if h == 12 else h
+        else:
+            h = h if h == 12 else h + 12
+        return f"{h:02d}:{mn:02d}"
+
+    def month_to_num(name):
+        return MONTHS.get(name[:3].lower(), name)
+
+    # 세션 %
     m = re.search(r'[Cc]urr.{0,3}session.*?(\d+)%', flat, re.S)
     if m:
         s_pct = m.group(1)
 
-    # 세션 리셋 — "Reses" 또는 "Resets" 뒤의 시간 (weekly reset 이전)
-    # flat에서 세션 영역: session ~ week 사이
+    # 세션 리셋 시간
     session_area = re.search(r'[Cc]urr.{0,3}session(.*?)(?=[Cc]urrentweek|\Z)', flat, re.S)
     if session_area:
         m = re.search(r'Rese.{0,2}(\d{1,2}(?::\d{2})?[ap]m)', session_area.group(1), re.I)
         if m:
-            s_reset = m.group(1).lower()
+            s_reset = to24h(m.group(1))
 
-    # 주간 % — "allmodels" 이후 첫 번째 NN%
+    # 주간 %
     m = re.search(r'allmodels.*?(\d+)%', flat, re.S)
     if m:
         w_pct = m.group(1)
 
-    # 주간 리셋 — "ResetsApr30at7pm" 형태
+    # 주간 리셋 — "ResetsApr30at7pm" → "4/30 19:00"
     m = re.search(r'Resets([A-Za-z]+)(\d+)at(\d{1,2}(?::\d{2})?[ap]m)', flat, re.I)
     if m:
-        w_reset = f"{m.group(1)}{m.group(2)} {m.group(3).lower()}"
+        mon = month_to_num(m.group(1))
+        day = m.group(2)
+        w_reset = f"{mon}/{day} {to24h(m.group(3))}"
 
     return s_pct, w_pct, s_reset, w_reset
 
@@ -124,6 +142,10 @@ if __name__ == '__main__':
         sys.exit(0)
 
     s_pct, w_pct, s_reset, w_reset = parse(raw)
-    pcts = f"{s_pct or '?'}% {w_pct or '?'}%wk"
-    resets = ' '.join(filter(None, [s_reset, w_reset]))
-    print(f"{pcts} / {resets}" if resets else pcts)
+    session = f"{s_pct or '?'}%"
+    if s_reset:
+        session += f" {s_reset}"
+    weekly = f"{w_pct or '?'}%wk"
+    if w_reset:
+        weekly += f" {w_reset}"
+    print(f"{session} · {weekly}")

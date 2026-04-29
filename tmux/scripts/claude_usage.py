@@ -135,21 +135,37 @@ def weekly_remain(md_hhmm):
     return f"{total_h}h"
 
 
+def colorize(text, pct_str, is_session=True):
+    try:
+        pct = int(pct_str)
+    except (ValueError, TypeError):
+        return text
+    if is_session and pct == 0:
+        color = 'red'
+    elif pct >= 85:
+        color = 'red'
+    elif pct >= 60:
+        color = 'colour208'  # orange
+    else:
+        return text
+    return f"#[fg={color}]{text}#[fg=default]"
+
+
 def display(raw_line):
     parts = raw_line.strip().split('|')
     if len(parts) != 4: return '?'
     s_pct, s_reset, w_pct, w_reset = parts
 
-    session = f"{s_pct}%"
+    s_text = f"{s_pct}%"
     if s_reset:
-        session += f" {session_remain(s_reset)}"
+        s_text += f" {session_remain(s_reset)}"
 
-    weekly = f"{w_pct}%wk"
+    w_text = f"{w_pct}%wk"
     w_rem = weekly_remain(w_reset) if w_reset else None
     if w_rem:
-        weekly += f" {w_rem}"
+        w_text += f" {w_rem}"
 
-    return f"{session} · {weekly}"
+    return f"{colorize(s_text, s_pct, is_session=True)} · {colorize(w_text, w_pct, is_session=False)}"
 
 
 if __name__ == '__main__':

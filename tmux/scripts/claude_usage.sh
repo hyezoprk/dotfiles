@@ -7,7 +7,7 @@ refresh_bg() {
     [[ -f "$LOCK" ]] && return
     touch "$LOCK"
     (
-        python3 ~/.config/tmux/scripts/claude_usage.py > "$CACHE.tmp" 2>/dev/null \
+        python3 /Users/hyezoprk/.config/tmux/scripts/claude_usage.py > "$CACHE.tmp" 2>/dev/null \
             && mv "$CACHE.tmp" "$CACHE"
         rm -f "$LOCK"
     ) &
@@ -23,4 +23,4 @@ fi
 # 최초 실행: 동기 fetch
 refresh_bg
 wait
-cat "$CACHE" 2>/dev/null || echo "CC: ?"
+cat "$CACHE" 2>/dev/null || echo "?"

@@ -135,6 +135,17 @@ def parse(raw):
     return s_pct, w_pct, s_reset, w_reset
 
 
+def session_remaining(hhmm):
+    from datetime import datetime, timedelta
+    h, m = map(int, hhmm.split(':'))
+    now = datetime.now()
+    reset = now.replace(hour=h, minute=m, second=0, microsecond=0)
+    if reset <= now:
+        reset += timedelta(days=1)
+    total_min = int((reset - now).total_seconds() // 60)
+    return f"{total_min // 60}:{total_min % 60:02d}"
+
+
 if __name__ == '__main__':
     raw = fetch()
     if not raw:
@@ -144,7 +155,7 @@ if __name__ == '__main__':
     s_pct, w_pct, s_reset, w_reset = parse(raw)
     session = f"{s_pct or '?'}%"
     if s_reset:
-        session += f" {s_reset}"
+        session += f" {session_remaining(s_reset)}"
     weekly = f"{w_pct or '?'}%wk"
     if w_reset:
         weekly += f" {w_reset}"

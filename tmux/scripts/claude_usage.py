@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 """
 Fetch Claude Code usage via `claude /usage` with PTY.
-Output: "45% 32%wk / 3pm Feb2 1pm"
+Output: "75% 40%wk / 6:40pm Apr30 7pm"
 """
-import pty, os, re, sys, time, select, signal, tempfile, shutil
+import pty, os, re, sys, time, select, signal
 
 CLAUDE = '/Users/hyezoprk/.local/bin/claude'
-TIMEOUT = 30
+TIMEOUT = 35
+WORKSPACE = os.path.join(os.environ.get('HOME', '/tmp'), '.claude-usage-workspace')
 
 
 def strip_ansi(s):
@@ -14,7 +15,7 @@ def strip_ansi(s):
 
 
 def fetch():
-    tmpdir = tempfile.mkdtemp(prefix='claude-usage-')
+    os.makedirs(WORKSPACE, exist_ok=True)
     master, slave = pty.openpty()
 
     env = dict(
@@ -34,7 +35,7 @@ def fetch():
         os.dup2(slave, 0); os.dup2(slave, 1); os.dup2(slave, 2)
         if slave > 2:
             os.close(slave)
-        os.chdir(tmpdir)
+        os.chdir(WORKSPACE)
         os.execve(CLAUDE, ['claude', '/usage'], env)
         os._exit(1)
 
@@ -43,6 +44,7 @@ def fetch():
     deadline = time.monotonic() + TIMEOUT
     found = False
     sent_trust = False
+    last_data = time.monotonic()
 
     while time.monotonic() < deadline:
         rem = deadline - time.monotonic()
@@ -58,13 +60,15 @@ def fetch():
             if not data:
                 break
             buf += data
+            last_data = time.monotonic()
             text = strip_ansi(buf.decode('utf-8', errors='replace'))
-            if not sent_trust and ('trust' in text.lower() or 'proceed' in text.lower()):
+            if not sent_trust and 'trust' in text.lower():
                 sent_trust = True
+                time.sleep(0.2)
                 os.write(master, b'\r')
-            if 'Current week (all models)' in text:
+            if 'allmodels' in text.replace(' ', '').lower():
                 found = True
-        elif found:
+        elif found and time.monotonic() - last_data > 0.8:
             break
 
     try: os.kill(pid, signal.SIGKILL)
@@ -73,37 +77,42 @@ def fetch():
     except: pass
     try: os.close(master)
     except: pass
-    shutil.rmtree(tmpdir, ignore_errors=True)
 
     return buf.decode('utf-8', errors='replace') if found else ''
 
 
-def parse(text):
-    t = strip_ansi(text)
-
-    def find_pct(s):
-        m = re.search(r'(\d+)%', s)
-        return m.group(1) if m else None
-
-    def find_time(s):
-        m = re.search(r'(\d{1,2}(?::\d{2})?)\s*([ap]m)', s, re.I)
-        return f"{m.group(1)}{m.group(2).lower()}" if m else None
+def parse(raw):
+    text = strip_ansi(raw)
+    # \r로 나뉜 라인들을 \n으로 통일
+    lines = [l.strip() for l in re.split(r'[\r\n]+', text) if l.strip()]
+    joined = '\n'.join(lines)
+    # 공백 제거 버전
+    flat = joined.replace(' ', '')
 
     s_pct = w_pct = s_reset = w_reset = None
 
-    m = re.search(r'Current session(.*?)(?=Current week|\Z)', t, re.S | re.I)
+    # 세션 % — "Curr(e|e)tsession" 이후 첫 번째 NN%
+    m = re.search(r'[Cc]urr.{0,3}session.*?(\d+)%', flat, re.S)
     if m:
-        s_pct = find_pct(m.group(1))
-        s_reset = find_time(m.group(1))
+        s_pct = m.group(1)
 
-    m = re.search(r'Current week \(all models\)(.*?)(?=\n\n|\Z)', t, re.S | re.I)
+    # 세션 리셋 — "Reses" 또는 "Resets" 뒤의 시간 (weekly reset 이전)
+    # flat에서 세션 영역: session ~ week 사이
+    session_area = re.search(r'[Cc]urr.{0,3}session(.*?)(?=[Cc]urrentweek|\Z)', flat, re.S)
+    if session_area:
+        m = re.search(r'Rese.{0,2}(\d{1,2}(?::\d{2})?[ap]m)', session_area.group(1), re.I)
+        if m:
+            s_reset = m.group(1).lower()
+
+    # 주간 % — "allmodels" 이후 첫 번째 NN%
+    m = re.search(r'allmodels.*?(\d+)%', flat, re.S)
     if m:
-        w_pct = find_pct(m.group(1))
-        r = re.search(r'Resets?\s+(\w+)\s+(\d+)(?:\s+at\s+(\S+))?', m.group(1), re.I)
-        if r:
-            w_reset = f"{r.group(1)}{r.group(2)}"
-            if r.group(3):
-                w_reset += f" {r.group(3).lower()}"
+        w_pct = m.group(1)
+
+    # 주간 리셋 — "ResetsApr30at7pm" 형태
+    m = re.search(r'Resets([A-Za-z]+)(\d+)at(\d{1,2}(?::\d{2})?[ap]m)', flat, re.I)
+    if m:
+        w_reset = f"{m.group(1)}{m.group(2)} {m.group(3).lower()}"
 
     return s_pct, w_pct, s_reset, w_reset
 
@@ -111,7 +120,7 @@ def parse(text):
 if __name__ == '__main__':
     raw = fetch()
     if not raw:
-        print('CC: ?')
+        print('?')
         sys.exit(0)
 
     s_pct, w_pct, s_reset, w_reset = parse(raw)

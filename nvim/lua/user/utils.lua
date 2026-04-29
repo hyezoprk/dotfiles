@@ -1,7 +1,7 @@
 local M = {}
 
 function M.snacksCmd(cmd)
-  return string.format(":lua Snacks.picker.%s()<CR>", cmd)
+  return string.format(":lua Snacks.picker.%s({ resume = false })<CR>", cmd)
 end
 
 -- 배너 설정

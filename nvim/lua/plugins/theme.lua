@@ -35,6 +35,9 @@ return {
       -- 회색
       vim.cmd('highlight typescriptDecorator guifg=#7E8294')
 
+      -- Snacks explorer: 점(.)으로 시작하는 파일 가시성
+      vim.api.nvim_set_hl(0, 'SnacksPickerPathHidden', { fg = '#a0a8b5' })
+
       -- 셀렉션
       vim.cmd('highlight Visual guibg=#534C44 guifg=NONE')
     end

@@ -1,3 +1,15 @@
+local function clear_image_cache()
+  local buf = vim.api.nvim_get_current_buf()
+  local cache = vim.fn.stdpath("cache") .. "/snacks/image"
+  if vim.fn.isdirectory(cache) == 1 then
+    vim.fn.system({ "rm", "-rf", cache })
+  end
+  local ok, placement = pcall(require, "snacks.image.placement")
+  if ok then
+    placement.clean(buf)
+  end
+end
+
 return {
   dir = vim.fn.stdpath("config"),
   name = "img-paste",
@@ -5,6 +17,8 @@ return {
     {
       "<leader>p",
       function()
+        clear_image_cache()
+
         local slug = vim.fn.expand("%:t:r")
         local fs_dir = vim.fn.getcwd() .. "/public/assets/posts/" .. slug
         local web_dir = "/assets/posts/" .. slug
@@ -63,7 +77,8 @@ return paths as text
           if vim.v.shell_error ~= 0 then
             vim.notify(name .. " 변환 실패", vim.log.levels.ERROR)
           else
-            table.insert(links, "![" .. name .. "](" .. web_dir .. "/" .. name .. ".webp)")
+            local encoded_dir = web_dir:gsub(" ", "%%20")
+            table.insert(links, "![" .. name .. "](" .. encoded_dir .. "/" .. name .. ".webp)")
           end
         end
 
@@ -75,7 +90,7 @@ return paths as text
       desc = "Paste image(s) to MDX",
     },
     {
-      "<leader>pd",
+      "<leader>dp",
       function()
         local line = vim.fn.getline(".")
         local img_path = line:match("!%[.-%]%((/assets/posts/[^)]+)%)")
@@ -96,6 +111,16 @@ return paths as text
         end)
       end,
       desc = "Delete image file and line",
+    },
+    {
+      "<leader>dc",
+      function()
+        clear_image_cache()
+        vim.cmd("edit!")
+        vim.cmd("redraw!")
+        vim.notify("이미지 캐시 초기화됨")
+      end,
+      desc = "Clear snacks image cache and reload",
     },
   },
 }

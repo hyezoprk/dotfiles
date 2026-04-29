@@ -6,6 +6,7 @@ function M.setup()
   require("user.autocmd.diagnostic-notify").setup()
   require("user.autocmd.ft").setup()
   require("user.autocmd.autosave").setup()
+  require("user.autocmd.autoread").setup()
 end
 
 return M

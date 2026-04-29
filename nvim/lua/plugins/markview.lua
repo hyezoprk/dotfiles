@@ -11,6 +11,7 @@ return {
       experimental = {
         check_rtp_message = false,
       },
+
       preview = {
         enable = true,
         render_distance = { 200, 200 },

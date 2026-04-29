@@ -59,6 +59,16 @@ return {
           desc = "Scratch anything",
         },
         { "<leader>sf", "<CMD>BufferLineSortByDirectory<CR>",                  desc = "Sorting buffers by directory" },
+        {
+          "<leader>sr",
+          function()
+            local from = vim.fn.input("찾기: ")
+            if from == "" then return end
+            local to = vim.fn.input("바꾸기: ")
+            vim.cmd("%s/" .. vim.fn.escape(from, "/\\") .. "/" .. vim.fn.escape(to, "/\\") .. "/g")
+          end,
+          desc = "Replace",
+        },
 
         -- Snacks
         -- Top Pickers & Explorer

@@ -18,7 +18,7 @@ return {
       ls.add_snippets("mdx", {
         -- MDX frontmatter
         s("fm", fmt(
-          '---\ntitle: "{}"\ndate: "{}"\ncategories: "{}"\ntags: "{}"\ndescription: "{}"\n---\n\n{}',
+          '---\ntitle: "{}"\ndate: "{}"\ncategory: "{}"\ntag: "{}"\ndescription: "{}"\ntype: "{}"\n---\n\n{}',
           {
             i(1, "제목"),
             f(function() return os.date("%Y-%m-%d") end),
@@ -29,6 +29,11 @@ return {
             }),
             i(3, "태그"),
             i(4),
+            c(5, {
+              t(""),
+              t("center"),
+              t("fiction"),
+            }),
             i(0),
           }
         )),
@@ -66,10 +71,13 @@ return {
         -- <SoundCloud src="..." />
         s("sc", fmt('<SoundCloud src="{}" />', { i(1) })),
 
+        -- <Center>...</Center>
+        s("center", fmt('<Center>\n{}\n</Center>', { i(1) })),
+
         -- <Book bid="..." />
         s("book", fmt('<Book bid="{}" />', { i(1) })),
 
-        -- <Movie mid="..." rating="..." />
+        -- <Movie mid="..." rating="..." at="..." with="..." />
         s("movie", fmt('<Movie mid="{}" rating="{}" />', { i(1), i(2, "4") })),
 
         -- blockquote label (color badges)
@@ -78,12 +86,13 @@ return {
         s("green",  { t({ "> [!green]",  "> " }), i(0) }),
         s("ask",    { t({ "> [!ask]",    "> " }), i(0) }),
         s("claude", { t({ "> [!claude]", "> " }), i(0) }),
+        s("fold",   fmt('> [!fold] {}\n> {}', { i(1, "제목"), i(0) })),
 
         -- ── 수영 admonition ──────────────────────────────────────────
-        s("warm",  { t({ "> [!WARM]",  "> " }), i(0) }),
-        s("main",  { t({ "> [!MAIN]",  "> " }), i(0) }),
-        s("drill", { t({ "> [!DRILL]", "> " }), i(0) }),
-        s("cool",  { t({ "> [!COOL]",  "> " }), i(0) }),
+        s("warm",  fmt('> [!WARM]{}\n> {}', { i(1), i(0) })),
+        s("main",  fmt('> [!MAIN]{}\n> {}', { i(1), i(0) })),
+        s("drill", fmt('> [!DRILL]{}\n> {}', { i(1), i(0) })),
+        s("cool",  fmt('> [!COOL]{}\n> {}', { i(1), i(0) })),
 
         -- ── GitHub 스타일 admonition (choice node로 한 번에) ──────────
         s("ad", fmt('> [!{}]\n> {}', {

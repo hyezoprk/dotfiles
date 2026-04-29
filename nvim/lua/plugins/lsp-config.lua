@@ -96,7 +96,15 @@ return {
         jsonls = {},
         graphql = {},
         dockerls = {},
-        mdx_analyzer = {},
+        mdx_analyzer = {
+          capabilities = {
+            workspace = {
+              didChangeWatchedFiles = {
+                dynamicRegistration = false,
+              },
+            },
+          },
+        },
         prismals = {},
       },
     },

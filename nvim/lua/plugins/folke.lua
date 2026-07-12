@@ -424,27 +424,6 @@ return {
           desc = "Goto Type Definition",
         },
 
-        -- Xcode
-        { "<leader>xs", "<cmd>XcodebuildSetup<cr>",                            desc = "Build Setup" },
-        { "<leader>xp", "<cmd>XcodebuildPicker<cr>",                           desc = "Build Picker" },
-        { "<leader>xl", "<cmd>XcodebuildToggleLogs<cr>",                       desc = "Toggle Xcodebuild Logs" },
-        { "<leader>xb", "<cmd>XcodebuildBuild<cr>",                            desc = "Build Project" },
-        { "<leader>xr", "<cmd>XcodebuildBuildRun<cr>",                         desc = "Build & Run Project" },
-        { "<leader>xt", "<cmd>XcodebuildTest<cr>",                             desc = "Run Tests" },
-        { "<leader>xT", "<cmd>XcodebuildTestClass<cr>",                        desc = "Run This Test Class" },
-        { "<leader>xd", "<cmd>XcodebuildSelectDevice<cr>",                     desc = "Select Device" },
-        { "<leader>xP", "<cmd>XcodebuildSelectTestPlan<cr>",                   desc = "Select Test Plan" },
-        { "<leader>xc", "<cmd>XcodebuildToggleCodeCoverage<cr>",               desc = "Toggle Code Coverage" },
-        { "<leader>xC", "<cmd>XcodebuildShowCodeCoverageReport<cr>",           desc = "Show Code Coverage Report" },
-        { "<leader>xq", "<cmd>Telescope quickfix<cr>",                         desc = "Show QuickFix List" },
-
-        { "<leader>dd", function() require("xcodebuild.integrations.dap").build_and_debug() end,           desc = "Build & Debug" },
-        { "<leader>dr", function() require("xcodebuild.integrations.dap").debug_without_build() end,       desc = "Debug Without Building" },
-        { "<leader>dt", function() require("xcodebuild.integrations.dap").debug_tests() end,               desc = "Debug Tests" },
-        { "<leader>dT", function() require("xcodebuild.integrations.dap").debug_class_tests() end,         desc = "Debug Class Tests" },
-        { "<leader>b",  function() require("xcodebuild.integrations.dap").toggle_breakpoint() end,         desc = "Toggle Breakpoint" },
-        { "<leader>B",  function() require("xcodebuild.integrations.dap").toggle_message_breakpoint() end, desc = "Toggle Message Breakpoint" },
-        { "<leader>dx", function() require("xcodebuild.integrations.dap").terminate_session() end,         desc = "Terminate Debugger" },
       })
     end,
   },

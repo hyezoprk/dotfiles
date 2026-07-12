@@ -73,7 +73,8 @@ return paths as text
         for i, src in ipairs(sources) do
           local name = string.format("%02d", base + i)
           local out = fs_dir .. "/" .. name .. ".webp"
-          vim.fn.system({ "/opt/homebrew/bin/magick", src, "-quality", "80", "webp:" .. out })
+          local script = vim.fn.stdpath("config") .. "/scripts/img2webp.sh"
+          vim.fn.system({ "/bin/sh", script, src, out, "80" })
           if vim.v.shell_error ~= 0 then
             vim.notify(name .. " 변환 실패", vim.log.levels.ERROR)
           else

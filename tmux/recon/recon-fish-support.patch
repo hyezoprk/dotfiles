@@ -1,8 +1,63 @@
 diff --git a/src/session.rs b/src/session.rs
-index f34699f..c1eedbc 100644
+index f34699f..d395d77 100644
 --- a/src/session.rs
 +++ b/src/session.rs
-@@ -1226,16 +1226,33 @@ fn discover_claude_tmux_panes() -> Vec<(i32, String, String, String)> {
+@@ -157,6 +157,41 @@ pub fn format_window(tokens: u64) -> String {
+     }
+ }
+ 
++/// After `/clear`, Claude creates a new JSONL with a fresh UUID while the session
++/// JSON ({PID}.json) still points to the old session-id. Find the newest unowned
++/// JSONL in `project_dir` that is newer than `matched_path` and not itself a live
++/// session-id — that file is the post-/clear conversation.
++fn find_post_clear_jsonl(
++    project_dir: &std::path::Path,
++    matched_path: &std::path::Path,
++    live_map: &HashMap<String, LiveSessionInfo>,
++) -> Option<PathBuf> {
++    let matched_mtime = matched_path.metadata().ok()?.modified().ok()?;
++    fs::read_dir(project_dir)
++        .ok()?
++        .flatten()
++        .filter_map(|e| {
++            let p = e.path();
++            if p.is_dir() {
++                return None;
++            }
++            if p.extension().map(|x| x != "jsonl").unwrap_or(true) {
++                return None;
++            }
++            let stem = p.file_stem()?.to_string_lossy().to_string();
++            if live_map.contains_key(&stem) {
++                return None;
++            }
++            let mtime = p.metadata().ok()?.modified().ok()?;
++            if mtime <= matched_mtime {
++                return None;
++            }
++            Some((mtime, p))
++        })
++        .max_by_key(|(mtime, _)| *mtime)
++        .map(|(_, p)| p)
++}
++
+ /// Discover sessions by scanning JSONL files, then matching to live tmux panes.
+ pub fn discover_sessions(prev_sessions: &HashMap<String, Session>) -> Vec<Session> {
+     let claude_dir = match dirs::home_dir() {
+@@ -252,6 +287,12 @@ pub fn discover_sessions(prev_sessions: &HashMap<String, Session>) -> Vec<Sessio
+                 continue;
+             }
+ 
++            // /clear creates a new JSONL but leaves the session JSON pointing to the
++            // old session-id. If a newer unowned JSONL exists in this project dir,
++            // switch to it so context tracking stays current.
++            let path = find_post_clear_jsonl(&project_dir, &path, &live_map)
++                .unwrap_or(path);
++
+             // Incremental JSONL parsing
+             let prev = prev_sessions.get(&session_id);
+             let info = parse_jsonl(
+@@ -1226,16 +1267,33 @@ fn discover_claude_tmux_panes() -> Vec<(i32, String, String, String)> {
  
  /// Check if a shell process has a claude child by looking for a child PID
  /// that has a corresponding ~/.claude/sessions/{PID}.json file.

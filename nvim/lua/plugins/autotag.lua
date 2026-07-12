@@ -14,6 +14,9 @@ return {
         Rule("~", "~", { "markdown", "mdx" }),
         Rule("_", "_", { "markdown", "mdx" }),
         Rule("<", ">", { "markdown", "mdx" }),
+        -- 일본어 낫표 (전역): 여는 문자 입력 시 닫는 문자 자동 생성 + 커서 가운데
+        Rule("「", "」"),
+        Rule("『", "』"),
       })
     end
   },

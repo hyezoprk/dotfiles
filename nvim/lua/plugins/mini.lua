@@ -3,7 +3,7 @@ return {
   version = false,
   event = "VeryLazy",
   config = function()
-    require("mini.pairs").setup()
+    -- autopair는 nvim-autopairs(autotag.lua)로 통일. mini.pairs는 사용하지 않음.
     require("mini.surround").setup()
     require("mini.comment").setup()
     require("mini.jump2d").setup({

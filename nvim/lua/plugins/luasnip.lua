@@ -18,7 +18,7 @@ return {
       ls.add_snippets("mdx", {
         -- MDX frontmatter
         s("fm", fmt(
-          '---\ntitle: "{}"\ndate: "{}"\ncategory: "{}"\ntag: "{}"\ndescription: "{}"\ntype: "{}"\n---\n\n{}',
+          '---\ntitle: "{}"\ndate: "{}"\ncategory: "{}"\ntag: "{}"\ndesc: "{}"\ntype: "{}"\n---\n\n{}',
           {
             i(1, "제목"),
             f(function() return os.date("%Y-%m-%d") end),
@@ -53,8 +53,14 @@ return {
           i(2),
         })),
 
+        -- \<...\>  꺾쇠를 리터럴 텍스트로 (MDX 이스케이프 자동)
+        s("lt", fmt("\\<{}\\>", { i(1) })),
+
         -- <Img src="..." alt="..." />
         s("img", fmt('<Img src="{}" alt="{}" />', { i(1), i(2) })),
+
+        -- <Gap rows="..." />
+        s("gap", fmt('<Gap rows="{}" />', { i(1, "10") })),
 
         -- <Lnk href="..." text="..." />
         s("lnk", fmt('<Lnk href="{}" text="{}" />', { i(1), i(2) })),

@@ -7,3 +7,4 @@ gh/hosts.yml
 github-copilot/apps.json
 nvim/lua/user/codelldb-darwin-arm64/
 swiftpm/
+**/__pycache__/

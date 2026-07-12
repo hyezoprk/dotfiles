@@ -100,18 +100,36 @@ def parse(raw):
 
     sa = re.search(r'[Cc]urr.{0,3}session(.*?)(?=[Cc]urrentweek|\Z)', flat, re.S)
     if sa:
-        m = re.search(r'Rese.{0,2}(\d{1,2}(?::\d{2})?[ap]m)', sa.group(1), re.I)
+        # [^\d]{0,6}: 숫자를 소비하지 않아야 "11:40pm"을 "1:40pm"으로 잘못 파싱하는 것을 방지
+        m = re.search(r'Rese[^\d]{0,6}(\d{1,2}(?::\d{2})?[ap]m)', sa.group(1), re.I)
         if m: s_reset = to24h(m.group(1))
 
     m = re.search(r'allmodels.*?(\d+)%', flat, re.S)
     if m: w_pct = m.group(1)
 
+    # 구형 포맷: "ResetsApr30at7pm"
     m = re.search(r'Resets([A-Za-z]+)(\d+)at(\d{1,2}(?::\d{2})?[ap]m)', flat, re.I)
     if m:
         mon = MONTHS.get(m.group(1)[:3].lower(), m.group(1))
         w_reset = f"{mon}/{m.group(2)} {to24h(m.group(3))}"
+    else:
+        # 신형 포맷: Currentweek 섹션에서 시간만 표시 "Resets7pm"
+        wa = re.search(r'[Cc]urrentweek(.*?)(?=[Ww]hat|[Aa]pprox|[Ee]xtra|\Z)', flat, re.S)
+        if wa:
+            m2 = re.search(r'Rese[^\d]{0,6}(\d{1,2}(?::\d{2})?[ap]m)', wa.group(1), re.I)
+            if m2:
+                t = to24h(m2.group(1))
+                h_val, mn_val = map(int, t.split(':'))
+                now_dt = datetime.now()
+                candidate = now_dt.replace(hour=h_val, minute=mn_val, second=0, microsecond=0)
+                if candidate <= now_dt:
+                    candidate += timedelta(days=1)
+                w_reset = f"{candidate.month}/{candidate.day} {t}"
 
     return s_pct, s_reset, w_pct, w_reset
+
+
+SESSION_WINDOW_MIN = 5 * 60  # 세션 윈도우는 항상 5시간 고정
 
 
 def session_remain(hhmm):
@@ -120,6 +138,10 @@ def session_remain(hhmm):
     reset = now.replace(hour=h, minute=m, second=0, microsecond=0)
     if reset <= now: reset += timedelta(days=1)
     total_min = int((reset - now).total_seconds() // 60)
+    # 세션이 아직 시작 안 된 상태(0%)면 reset 시각이 "지금"과 거의 같게 내려와
+    # +1일 보정 후 ~24시간처럼 보이는 값이 나올 수 있음 → 최대 윈도우(5h)로 캡
+    if total_min > SESSION_WINDOW_MIN:
+        total_min = SESSION_WINDOW_MIN - 1
     return f"{total_min // 60}:{total_min % 60:02d}"
 
 

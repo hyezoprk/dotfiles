@@ -11,6 +11,7 @@ macOS 개발 환경 설정 모음. Neovim + tmux + Ghostty + Fish shell.
 | Fish | starship 프롬프트 |
 | Ghostty | 터미널 에뮬레이터 |
 | yabai + skhd | 타일링 윈도우 매니저 |
+| Claude Code | `settings.json` + `CLAUDE.md` (참고용 사본, 실제 위치는 `~/.claude/`) |
 
 ---
 
